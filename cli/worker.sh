@@ -1,0 +1,1 @@
+/usr/bin/php /home/yugo/Projects/levart/cli/QueueWorker.php

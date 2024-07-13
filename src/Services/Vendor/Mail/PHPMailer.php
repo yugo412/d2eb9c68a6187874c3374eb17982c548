@@ -9,8 +9,6 @@ use Yugo\Services\Mail;
 class PHPMailer extends Mailer implements Mail
 {
 
-    use Queueable;
-
     private BasePHPMailer $mailer;
 
     public function __construct()

@@ -77,7 +77,7 @@ class Route
          */
         $hasClass = function (string $class) use ($container): void {
             if (!$container->has($class)) {
-                throw new Exception(sprintf('Class %s is not registered', $class));
+                throw new Exception(sprintf('Class %s is not registered.', $class));
             }
         };
 

@@ -12,8 +12,6 @@ use Yugo\Services\Vendor\Mail\Mailer as BaseMailer;
 
 class SymfonyMailer extends BaseMailer implements Mail
 {
-    use Queueable;
-
     private Mailer $mailer;
 
     private Email $mail;

@@ -7,8 +7,6 @@ use Yugo\Services\Mail;
 
 class SimpleMailer extends Mailer implements Mail
 {
-    use Queueable;
-
     private array $addresses;
 
     private string $subject;

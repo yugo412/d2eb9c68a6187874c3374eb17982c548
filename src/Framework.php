@@ -48,7 +48,11 @@ final class Framework
         } else {
             throw new RouteException('Route not found.');
         }
+    }
 
+    public function exec(\Closure $callback): void
+    {
+        $callback($this->container);
     }
 
     private function env(): void

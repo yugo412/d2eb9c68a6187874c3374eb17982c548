@@ -13,3 +13,11 @@ if (!function_exists('set_env')) {
         putenv("{$key}={$value}");
     }
 }
+
+if (!function_exists('dd')) {
+    function dd(...$args): void
+    {
+        dump($args);
+        exit;
+    }
+}
