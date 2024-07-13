@@ -32,7 +32,7 @@ class Route
                 ...$this->bind(new ReflectionFunction($this->handler), $container),
             );
         } else {
-            $controller = new $this->handler[0];
+            $controller = new $this->handler[0]($container);
             if (!empty($controller->middlewares)) {
                 $this->middleware = array_merge($this->middleware, $controller->middlewares);
             }

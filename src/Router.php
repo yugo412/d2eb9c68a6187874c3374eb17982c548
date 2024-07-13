@@ -5,12 +5,13 @@ namespace Yugo;
 use Closure;
 use Exception;
 use InvalidArgumentException;
+use Yugo\Exceptions\RouteException;
 use Yugo\Http\Method;
 use Yugo\Http\Route;
 
 /**
- * @method self get(string $class, Closure|array $param) Alias for add(...$args)
- * @method self post(string $class, Closure|array $param) Alias for add(...$args)
+ * @method self get(string $path, Closure|array $param) Alias for add(...$args)
+ * @method self post(string $path, Closure|array $param) Alias for add(...$args)
  */
 class Router
 {
@@ -45,7 +46,7 @@ class Router
 
         $this->routes[] = [
             'method' => $method,
-            'path' => $path,
+            'path' => str_starts_with($path, '/') ? $path : '/' . $path,
             'handler' => $handler,
             'middleware' => $this->middlewares,
         ];
@@ -54,9 +55,25 @@ class Router
     }
 
     /**
+     * @throws RouteException
+     */
+    public function match(array $methods, string $path, Closure|array $handler): self
+    {
+        foreach ($methods as $method) {
+            if ($method === Method::Any) {
+                throw new RouteException('Method any is not allowed in match().');
+            }
+
+            $this->add($method, $path, $handler);
+        }
+
+        return $this;
+    }
+
+    /**
      * @throws Exception
      */
-    public function match(): ?Route
+    public function find(): ?Route
     {
         foreach ($this->routes as $route) {
             $requestPath = $this->path();
@@ -68,7 +85,11 @@ class Router
                 if ($route['method'] === Method::Any || $this->method() === $route['method']->value) {
                     return new Route(...$route);
                 } else {
-                    throw new Exception(vsprintf('Method %s not supported for route "%s"', [
+                    if ($this->countPath($requestPath) > 1) {
+                        continue;
+                    }
+
+                    throw new RouteException(vsprintf('Method %s not supported for route "%s".', [
                         strtoupper($this->method()),
                         $route['path'],
                     ]));
@@ -77,6 +98,18 @@ class Router
         }
 
         return null;
+    }
+
+    private function countPath(string $path): int
+    {
+        $counter = 0;
+        array_map(function (array $route) use(&$counter, $path): void {
+            if ($route['path'] === $path) {
+                $counter++;
+            }
+        }, $this->routes);
+
+        return $counter;
     }
 
     private function setMiddleware(array $classes): void
