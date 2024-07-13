@@ -124,6 +124,8 @@ class Router
 
     private function path(): string
     {
-        return strtolower($_SERVER['REQUEST_URI']);
+        return strtolower(
+            parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+        );
     }
 }
