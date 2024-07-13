@@ -11,13 +11,13 @@ use Psr\Http\Message\ResponseInterface;
 use ReflectionFunction;
 use ReflectionMethod;
 
-readonly class Route
+class Route
 {
     public function __construct(
         private readonly Method        $method,
         private readonly string        $path,
         private readonly Closure|array $handler,
-        private readonly array        $middleware,
+        private array                  $middleware,
     )
     {
     }
@@ -27,20 +27,23 @@ readonly class Route
      */
     public function handle(Container $container): void
     {
-        $classes = [];
-
         if (is_callable($this->handler)) {
             $response = ($this->handler)(
                 ...$this->bind(new ReflectionFunction($this->handler), $container),
             );
         } else {
-            $response = (new $this->handler[0])->{$this->handler[1]}(
+            $controller = new $this->handler[0];
+            if (!empty($controller->middlewares)) {
+                $this->middleware = array_merge($this->middleware, $controller->middlewares);
+            }
+
+            $response = $controller->{$this->handler[1]}(
                 ...$this->bind(new ReflectionMethod($this->handler[0], $this->handler[1]), $container)
             );
         }
 
         if ($response instanceof ResponseInterface) {
-            foreach ($this->middleware as $middleware) {
+            foreach (array_unique($this->middleware) as $middleware) {
                 if (!method_exists($middleware, 'handle')) {
                     throw new Exception(sprintf('Method handle() in %s does not exists', $middleware));
                 }
