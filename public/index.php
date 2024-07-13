@@ -22,8 +22,8 @@ $app->route->add(Method::Any, '/', function (Request $request, Response $respons
 $app->route->get('/ping', fn(): string => 'Pong!');
 
 $app->route->middleware([Auth::class], function (Router $app): void {
-    $app->get('/mail', [MailController::class, 'index']);
-    $app->get('/mail/send', [MailController::class, 'send']);
+    $app->match([Method::Post, Method::Get], '/mail', [MailController::class, 'index']);
+    $app->post('/mail/send', [MailController::class, 'send']);
 });
 
 $app->run();
