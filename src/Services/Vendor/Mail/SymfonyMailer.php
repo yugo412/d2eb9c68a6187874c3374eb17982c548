@@ -18,14 +18,10 @@ class SymfonyMailer extends BaseMailer implements Mail
 
     public function __construct()
     {
-        $transport = Transport::fromDsn(
-            vsprintf(
-                'smtp://%s:%s', [
-                getenv('MAIL_SMTP_HOST'),
-                getenv('MAIL_SMTP_PORT'),
-                ]
-            )
-        );
+        $transport = Transport::fromDsn(vsprintf('smtp://%s:%s', [
+            getenv('MAIL_SMTP_HOST'),
+            getenv('MAIL_SMTP_PORT'),
+        ]));
 
         $this->mailer = new Mailer($transport);
         $this->mail = new Email;
@@ -72,12 +68,10 @@ class SymfonyMailer extends BaseMailer implements Mail
     public function send(): void
     {
         if (empty($this->mail->getFrom())) {
-            $this->mail->from(
-                new Address(
-                    getenv('MAIL_FROM_ADDRESS'),
-                    getenv('MAIL_FROM_NAME'),
-                )
-            );
+            $this->mail->from(new Address(
+                getenv('MAIL_FROM_ADDRESS'),
+                getenv('MAIL_FROM_NAME'),
+            ));
         }
 
         $this->mail->getHeaders()

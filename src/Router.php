@@ -89,14 +89,10 @@ class Router
                         continue;
                     }
 
-                    throw new RouteException(
-                        vsprintf(
-                            'Method %s not supported for route "%s".', [
-                            strtoupper($this->method()),
-                            $route['path'],
-                            ]
-                        )
-                    );
+                    throw new RouteException(vsprintf('Method %s not supported for route "%s".', [
+                        strtoupper($this->method()),
+                        $route['path'],
+                    ]));
                 }
             }
         }
@@ -107,13 +103,11 @@ class Router
     private function countPath(string $path): int
     {
         $counter = 0;
-        array_map(
-            function (array $route) use (&$counter, $path): void {
-                if ($route['path'] === $path) {
-                    $counter++;
-                }
-            }, $this->routes
-        );
+        array_map(function (array $route) use(&$counter, $path): void {
+            if ($route['path'] === $path) {
+                $counter++;
+            }
+        }, $this->routes);
 
         return $counter;
     }

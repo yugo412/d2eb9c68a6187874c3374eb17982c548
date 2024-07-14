@@ -54,20 +54,16 @@ class MailController extends Controller
             $validator->rule('email', ['address.*']);
 
             if (!$validator->validate()) {
-                return new JsonResponse(
-                    [
+                return new JsonResponse([
                     'message' => 'Validation errors.',
                     'errors' => $validator->errors(),
-                    ], 422
-                );
+                ], 422);
             }
 
             foreach ($mails['address'] as $to) {
-                $this->log->info(
-                    'Prepare to send an email.', [
+                $this->log->info('Prepare to send an email.', [
                     'to' => $to,
-                    ]
-                );
+                ]);
 
                 $mails['to'] = $to;
 
@@ -76,11 +72,9 @@ class MailController extends Controller
 
             return new EmptyResponse(201);
         } catch (Exception $e) {
-            return new JsonResponse(
-                [
+            return new JsonResponse([
                 'message' => $e->getMessage(),
-                ], 500
-            );
+            ], 500);
         }
     }
 
@@ -89,18 +83,14 @@ class MailController extends Controller
         $mails = $this->db->statement()
             ->query('SELECT * FROM mails');
 
-        return new JsonResponse(
-            array_map(
-                function ($mail) {
-                    return [
-                    'id' => $mail['id'],
-                    'from' => $mail['from'],
-                    'to' => $mail['to'],
-                    'subject' => $mail['subject'],
-                    'body' => $mail['body'],
-                    ];
-                }, $mails->fetchAll()
-            )
-        );
+        return new JsonResponse(array_map(function ($mail) {
+            return [
+                'id' => $mail['id'],
+                'from' => $mail['from'],
+                'to' => $mail['to'],
+                'subject' => $mail['subject'],
+                'body' => $mail['body'],
+            ];
+        }, $mails->fetchAll()));
     }
 }

@@ -18,17 +18,15 @@ class AuthController
 
     public function register(): Response
     {
-        $randomString = function (int $length = 10): string {
-            return substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length/strlen($x)))), 1, $length);
+        $randomString = function(int $length = 10): string {
+            return substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length/strlen($x)) )),1,$length);
         };
 
         $this->db->statement()->prepare('INSERT INTO tokens (token) VALUES (:token)')
             ->execute(['token' => $token = $randomString(60)]);
 
-        return new JsonResponse(
-            [
+        return new JsonResponse([
             'token' => $token,
-            ], 201
-        );
+        ], 201);
     }
 }
