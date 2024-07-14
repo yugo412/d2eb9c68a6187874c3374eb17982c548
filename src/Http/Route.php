@@ -7,6 +7,7 @@ use DI\Container;
 use DI\DependencyException;
 use DI\NotFoundException;
 use Exception;
+use Laminas\Diactoros\Response\TextResponse;
 use Psr\Http\Message\ResponseInterface;
 use ReflectionFunction;
 use ReflectionMethod;
@@ -100,17 +101,17 @@ class Route
 
     private function sendResponse(mixed $response): void
     {
-        if ($response instanceof ResponseInterface) {
-            http_response_code($response->getStatusCode());
-
-            $response = $response->withHeader('Cache-Control', 'max-age=3600');
-            $response = $response->withHeader('ETag', md5($response->getBody()));
-
-            $this->writeHeader($response->getHeaders());
-
-            echo $response->getBody();
-        } elseif (is_string($response)) {
-            echo $response;
+        if (is_string($response)) {
+            $response = new TextResponse($response);
         }
+
+        http_response_code($response->getStatusCode());
+
+        $response = $response->withHeader('Cache-Control', 'max-age=3600');
+        $response = $response->withHeader('ETag', md5($response->getBody()));
+
+        $this->writeHeader($response->getHeaders());
+
+        echo $response->getBody();
     }
 }
