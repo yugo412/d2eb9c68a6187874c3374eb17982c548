@@ -20,8 +20,7 @@ class Route
         private readonly string        $path,
         private readonly Closure|array $handler,
         private array                  $middleware,
-    )
-    {
+    ) {
     }
 
     /**
