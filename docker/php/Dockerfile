@@ -19,15 +19,19 @@ RUN pecl install redis \
     && docker-php-ext-enable redis
 
 RUN apk add php-dom \
-    && apk add php-ctype \
-    && apk add php-tokenizer \
-    && apk add php-xml \
-    && apk add php-simplexml \
-    && apk add php-xmlwriter
+    php-ctype \
+    php-tokenizer \
+    php-xml \
+    php-simplexml \
+    php-xmlwriter \
+    php-pdo \
+    php-pgsql
 RUN composer install
 
 RUN mkdir /var/www/html/storage/logs
 RUN touch /var/www/html/storage/logs/app.log
 RUN chown -R www-data:www-data /var/www/html
+
+vendor/bin/phinx migrate -e production
 
 CMD ["/bin/sh", "-c", "php-fpm -D && /usr/bin/supervisord -n -c /etc/supervisord.conf"]

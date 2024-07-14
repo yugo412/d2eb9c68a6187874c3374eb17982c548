@@ -11,6 +11,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface as Log;
 use Yugo\Jobs\SendMail;
 use Yugo\Middlewares\Auth;
+use Yugo\Services\Database;
 use Yugo\Services\Mail;
 use Yugo\Services\Queue;
 
@@ -24,6 +25,8 @@ class MailController extends Controller
 
     private Log $log;
 
+    private Database $db;
+
     public function __construct(private readonly Container $container)
     {
         // force change mail transport on the fly
@@ -36,6 +39,7 @@ class MailController extends Controller
 
         $this->queue = $this->container->get(Queue::class);
         $this->log = $this->container->get(Log::class);
+        $this->db = $this->container->get(Database::class);
     }
 
     public function send(Request $request): Response
@@ -62,6 +66,17 @@ class MailController extends Controller
 
     public function index(Request $request, Response $response): Response
     {
-        return $response;
+        $mails = $this->db->statement()
+            ->query('SELECT * FROM mails');
+
+        return new JsonResponse(array_map(function ($mail) {
+            return [
+                'id' => $mail['id'],
+                'from' => $mail['from'],
+                'to' => $mail['to'],
+                'subject' => $mail['subject'],
+                'body' => $mail['body'],
+            ];
+        }, $mails->fetchAll()));
     }
 }

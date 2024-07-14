@@ -8,7 +8,6 @@ use Yugo\Services\Mail;
 
 class PHPMailer extends Mailer implements Mail
 {
-
     private BasePHPMailer $mailer;
 
     public function __construct()

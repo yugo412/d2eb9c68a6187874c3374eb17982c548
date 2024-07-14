@@ -21,3 +21,14 @@ if (!function_exists('dd')) {
         exit;
     }
 }
+
+if (!function_exists('now')) {
+    function now(bool $immutable = false): DateTime|DateTimeImmutable
+    {
+        if ($immutable) {
+            return new DateTimeImmutable();
+        }
+
+        return new DateTime();
+    }
+}
