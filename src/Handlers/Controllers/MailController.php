@@ -11,7 +11,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface as Log;
 use Valitron\Validator;
 use Yugo\Jobs\SendMail;
-use Yugo\Middlewares\Auth;
+use Yugo\Http\Middlewares\Auth;
 use Yugo\Services\Database;
 use Yugo\Services\Mail;
 use Yugo\Services\Queue;

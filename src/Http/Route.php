@@ -9,6 +9,7 @@ use DI\NotFoundException;
 use Exception;
 use Laminas\Diactoros\Response\TextResponse;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use ReflectionFunction;
 use ReflectionMethod;
 
@@ -38,19 +39,27 @@ class Route
                 $this->middleware = array_merge($this->middleware, $controller->middlewares);
             }
 
-            $response = $controller->{$this->handler[1]}(
-                ...$this->bind(new ReflectionMethod($this->handler[0], $this->handler[1]), $container)
-            );
-        }
+            $arguments = $this->bind(new ReflectionMethod($this->handler[0], $this->handler[1]), $container);
+            foreach ($arguments as $argument) {
+                if ($argument instanceof ServerRequestInterface) {
+                    $request = $argument;
 
-        if ($response instanceof ResponseInterface) {
+                    break;
+                }
+            }
+
             foreach (array_unique($this->middleware) as $middleware) {
                 if (!method_exists($middleware, 'handle')) {
                     throw new Exception(sprintf('Method handle() in %s does not exists', $middleware));
                 }
 
-                $response = (new $middleware)->handle(clone $response);
+                $middlewareResponse = (new $middleware($container))->handle($request ?? null);
+                if ($middlewareResponse instanceof ResponseInterface) {
+                    $this->sendResponse($middlewareResponse);
+                }
             }
+
+            $response = $controller->{$this->handler[1]}(...$arguments);
         }
 
         $this->sendResponse($response);
@@ -113,5 +122,6 @@ class Route
         $this->writeHeader($response->getHeaders());
 
         echo $response->getBody();
+        exit;
     }
 }
