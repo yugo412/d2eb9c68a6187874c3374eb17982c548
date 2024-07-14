@@ -1,20 +1,20 @@
 ## Installation
 
 - Clone this repository to your local machine.
-- Run the application using Docker Compose by running command below:
+- Go to cloned directory and run the application using Docker Compose by running command below:
 ```bash
 docker-compose up --build -d
 ```
 
-Last step before accessing the app is running migration to create some required tables. Please run command below manually after build completed.
+Last step before accessing the app is running migration to create some required tables. Please execute command below manually after build completed.
 
 ```bash
 docker exec -it php-container vendor/bin/phinx migrate -e development
 ```
 
-If there is no error, you can open URL [https://localhost:8080/ping]() to make sure build is successful and the app running as expected.
+If there is no error, you can open URL [https://localhost:8080/ping](https://localhost:8080/ping) to make sure build is successful and the app running as expected.
 
-Other than main app, you can open [http://localhost:8081]() to access mail client based on [Mailpit](https://mailpit.axllent.org/) service.
+Other than main app, you can open [http://localhost:8081](http://localhost:8081) to access mail client based on [Mailpit](https://mailpit.axllent.org/) service.
 
 ***
 
@@ -78,7 +78,7 @@ curl --location 'http://localhost:8080/mail/send' \
 }'
 ```
 
-To ensure the mail was sent successfully, you can check it from the mail client at the URL [http://localhost:8081](). Alternatively, you can check the endpoint below to confirm that the sent emails are stored in the PostgreSQL database.
+To ensure the mail was sent successfully, you can check it from the mail client at the URL [http://localhost:8081](http://localhost:8081). Alternatively, you can check the endpoint below to confirm that the sent emails are stored in the PostgreSQL database.
 
 ```dockerfile
 curl --location 'http://localhost:8080/mail' \
