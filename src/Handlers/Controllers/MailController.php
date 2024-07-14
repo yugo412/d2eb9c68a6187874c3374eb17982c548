@@ -8,6 +8,7 @@ use Laminas\Diactoros\Response\EmptyResponse;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Log\LoggerInterface as Log;
 use Yugo\Jobs\SendMail;
 use Yugo\Middlewares\Auth;
 use Yugo\Services\Mail;
@@ -21,24 +22,31 @@ class MailController extends Controller
 
     private Queue $queue;
 
+    private Log $log;
+
     public function __construct(private readonly Container $container)
     {
         // force change mail transport on the fly
-        // set_env('MAIL_TRANSPORTER', 'PHPMailer');
+        // set_env('MAIL_TRANSPORTER', 'SymfonyMailer');
 
         $this->mail = $this->container->get(Mail::class);
 
-        // get_env('MAIL_TRANSPORTER'); -> SymfonyMailer
-        // $this->mail->transport(); -> PHPMailer
+        // get_env('MAIL_TRANSPORTER'); -> PHPMailer
+        // $this->mail->transport(); -> SymfonyMailer
 
         $this->queue = $this->container->get(Queue::class);
+        $this->log = $this->container->get(Log::class);
     }
 
-    public function send(Request $request, Response $response): Response
+    public function send(Request $request): Response
     {
         try {
             $mails = json_decode($request->getBody()->getContents(), true);
             foreach ($mails['address'] as $to) {
+                $this->log->info('Prepare to send an email.', [
+                    'to' => $to,
+                ]);
+
                 $mails['to'] = $to;
 
                 $this->queue->dispatch(new SendMail($mails, $this->mail));
