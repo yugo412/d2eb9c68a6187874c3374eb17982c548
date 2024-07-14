@@ -12,7 +12,7 @@ Last step before accessing the app is running migration to create some required 
 docker exec -it php-container vendor/bin/phinx migrate -e development
 ```
 
-If there is no error, you can open URL [https://localhost:8080/ping](https://localhost:8080/ping) to make sure build is successful and the app running as expected.
+If there is no error, you can open URL [https//localhost:8080/ping](http://localhost:8080/ping) to make sure build is successful and the app running as expected.
 
 Other than main app, you can open [http://localhost:8081](http://localhost:8081) to access mail client based on [Mailpit](https://mailpit.axllent.org/) service.
 
@@ -23,7 +23,7 @@ Reserved ports:
 - 8081 (mail client)
 - 1015 (SMTP port)
 
-Please make sure these port is not used by host machine to prevents conflict when building the app.
+Please ensure that these ports are not being used by the host machine, to prevent any conflicts when building the app.
 
 ## Application Lifecycle
 1. Bootstrap Application:
