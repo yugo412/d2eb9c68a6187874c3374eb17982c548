@@ -6,8 +6,7 @@ use ReflectionClass;
 
 abstract class Mailer
 {
-    function transport(): string
-    {
+    function transport(): string {
         return (new ReflectionClass($this))->getShortName();
     }
 }
