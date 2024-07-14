@@ -6,7 +6,10 @@ WORKDIR /var/www/html
 
 COPY . /var/www/html
 COPY .env.example .env
-RUN chown -R www-data:www-data /var/www/html
+
+RUN apk add supervisor
+RUN mkdir /var/log/supervisor
+ADD ./docker/supervisor/supervisord.conf /etc/supervisord.conf
 
 RUN apk add composer
 RUN apk add $PHPIZE_DEPS
@@ -22,13 +25,9 @@ RUN apk add php-dom \
     && apk add php-simplexml \
     && apk add php-xmlwriter
 RUN composer install
-RUN chown -R www-data:www-data vendor
 
-RUN apk add multirun
-#RUN touch /var/www/html/cli/worker.sh
-#RUN echo "/usr/local/bin/php /var/www/html/cli/QueueWorker.php" > /var/www/html/cli/worker.sh
-#RUN chown www-data:www-data /var/www/html/cli/worker.sh
-#RUN chmod a+x /var/www/html/cli/worker.sh
+RUN mkdir /var/www/html/storage/logs
+RUN touch /var/www/html/storage/logs/app.log
+RUN chown -R www-data:www-data /var/www/html
 
-WORKDIR /var/www/html/cli
-#CMD ["multirun", "\"/usr/local/bin/php /var/www/html/cli/QueueWorker.php\""]
+CMD ["/bin/sh", "-c", "php-fpm -D && /usr/bin/supervisord -n -c /etc/supervisord.conf"]

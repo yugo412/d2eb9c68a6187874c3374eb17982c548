@@ -1,6 +1,5 @@
 .env
 
 .idea
-#/docker
-/storage
+/storage/logs
 /vendor
