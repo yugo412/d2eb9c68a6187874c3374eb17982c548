@@ -1,0 +1,35 @@
+services:
+  nginx:
+    container_name: "nginx-container"
+    image: nginx:1.27.0-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - .:/var/www/html
+    depends_on:
+      - php
+
+  php:
+    container_name: "php-container"
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    depends_on:
+      - redis
+      - mailpit
+
+  redis:
+    container_name: "redis-container"
+    image: redis:latest
+
+  mailpit:
+    container_name: "mailpit-container"
+    image: axllent/mailpit:latest
+    ports:
+      - "8081:8025"
+      - "1025:1025"
+
+networks:
+  internal:
+    driver: bridge
