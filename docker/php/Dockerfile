@@ -33,7 +33,7 @@ RUN apk add php-dom \
     php-pgsql
 RUN composer install
 
-RUN mkdir /var/www/html/storage/logs
+RUN mkdir -p /var/www/html/storage/logs
 RUN touch /var/www/html/storage/logs/app.log
 RUN chown -R www-data:www-data /var/www/html
 
