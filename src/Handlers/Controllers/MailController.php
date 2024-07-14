@@ -9,6 +9,7 @@ use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface as Log;
+use Valitron\Validator;
 use Yugo\Jobs\SendMail;
 use Yugo\Middlewares\Auth;
 use Yugo\Services\Database;
@@ -46,6 +47,19 @@ class MailController extends Controller
     {
         try {
             $mails = json_decode($request->getBody()->getContents(), true);
+            $validator = new Validator($mails);
+
+            $validator->rule('required', ['address', 'body']);
+            $validator->rule('array', ['address']);
+            $validator->rule('email', ['address.*']);
+
+            if (!$validator->validate()) {
+                return new JsonResponse([
+                    'message' => 'Validation errors.',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
             foreach ($mails['address'] as $to) {
                 $this->log->info('Prepare to send an email.', [
                     'to' => $to,
