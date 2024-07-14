@@ -11,12 +11,17 @@ RUN apk add supervisor
 RUN mkdir /var/log/supervisor
 ADD ./docker/supervisor/supervisord.conf /etc/supervisord.conf
 
-RUN apk add composer
-RUN apk add $PHPIZE_DEPS
+RUN apk add --no-cache composer \
+    $PHPIZE_DEPS
 
 RUN pecl install redis \
-    && apk add php-redis \
+    && apk add --no-cache php-redis \
     && docker-php-ext-enable redis
+
+RUN set -ex \
+	&& apk --no-cache add postgresql-libs postgresql-dev \
+	&& docker-php-ext-install pgsql pdo_pgsql \
+	&& apk del postgresql-dev
 
 RUN apk add php-dom \
     php-ctype \
@@ -32,6 +37,6 @@ RUN mkdir /var/www/html/storage/logs
 RUN touch /var/www/html/storage/logs/app.log
 RUN chown -R www-data:www-data /var/www/html
 
-vendor/bin/phinx migrate -e production
+#RUN vendor/bin/phinx migrate -e development
 
 CMD ["/bin/sh", "-c", "php-fpm -D && /usr/bin/supervisord -n -c /etc/supervisord.conf"]

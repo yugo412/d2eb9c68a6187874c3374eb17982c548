@@ -1,6 +1,8 @@
 services:
   nginx:
     image: nginx:1.27.0-alpine
+    networks:
+      - internal
     ports:
       - "8080:80"
     volumes:
@@ -9,21 +11,42 @@ services:
     depends_on:
       - php
 
+  database:
+    image: postgres:14-alpine
+    networks:
+      - internal
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+
   php:
+    restart: always
+    networks:
+      - internal
     build:
       context: .
       dockerfile: ./docker/php/Dockerfile
+    links:
+      - database:database
     depends_on:
       - redis
       - mailpit
+      - database
 
   redis:
     image: redis:latest
+    networks:
+      - internal
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
 
   mailpit:
     image: axllent/mailpit:latest
+    networks:
+      - internal
     ports:
       - "8081:8025"
       - "1025:1025"
